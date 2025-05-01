@@ -1,0 +1,35 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables file
+.env
+
+# Log files
+*.log
+
+# OS-specific files
+.DS_Store       # macOS
+Thumbs.db       # Windows
+
+# npm package lock file (optional if you're using package-lock.json)
+package-lock.json
+
+# Vercel or other platform deployments (optional)
+.vercel/
+
+# IDE files
+.vscode/
+.idea/
+
+# NPM Debug files
+npm-debug.log*
+
+# Yarn
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage folder (optional, if you are using a coverage tool)
+coverage/
+
+# Other files to ignore if you're using specific tools
+*.tgz  # For packaged tarballs (if you're publishing modules)
