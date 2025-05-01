@@ -21,7 +21,7 @@ app.post("/create-issue", async (req, res) => {
     await axios.post(
       `https://api.github.com/repos/${process.env.REPO}/actions/workflows/create-issue.yml/dispatches`,
       {
-        ref: "main",
+        ref: "main", // or your default branch
         inputs: {
           title,
           body: `Created by @${user_name} via Slack:\n\n${body}`,
@@ -36,12 +36,14 @@ app.post("/create-issue", async (req, res) => {
     );
 
     res.send(`✅ Issue creation triggered for *${title}*`);
+    console.log(
+      `Issue creation triggered for *${title}* by @${user_name}:\n\n${body}`
+    );
   } catch (err) {
-    console.error(err.response?.data || err.message);
+    console.error("❌ GitHub API error:", err.response?.data || err.message);
     res.send("❌ Failed to create issue.");
   }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-
