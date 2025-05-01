@@ -127,7 +127,9 @@ app.post("/slack/interactive", async (req, res) => {
 
 
 
-
+app.get("/ping", (req, res) => {
+  res.send("Server is alive!");
+});
 
 
 const PORT = process.env.PORT || 3000;
