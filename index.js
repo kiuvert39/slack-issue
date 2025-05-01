@@ -93,58 +93,26 @@ app.post("/slack/interactive", async (req, res) => {
     const title = payload.view.state.values.title_section.title_input.value;
     const description = payload.view.state.values.description_section.description_input.value;
 
-    const userId = payload.user.id; // Get the Slack user ID of the person submitting the issue
-
-    // Fetch user details (name) from Slack API
+    // Trigger GitHub Action to create the issue
     try {
-      const userResponse = await axios.get(`${slackApiUrl}?user=${userId}`, {
-        headers: {
-          Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
+      await axios.post(
+        `https://api.github.com/repos/${process.env.REPO}/issues`,
+        {
+          title,
+          body: description, // Use description as body
         },
-      });
-
-      // Get the user's real name from the response
-      const userName = userResponse.data.user.real_name || userResponse.data.user.name;
-
-      // Format the issue body with the creator's name
-      const issueBody = `
-                    **Title**: ${title}
-
-                    **Description**:
-                    ${description}
-
-                    **Created by**: ${userName}
-                    `;
-
-      // Trigger GitHub Action to create the issue with the formatted body
-      try {
-        await axios.post(
-          `https://api.github.com/repos/${process.env.REPO}/issues`,
-          {
-            title,
-            body: issueBody, // Use the formatted issue body here
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.PERSONAL_ACCESS_TOKEN}`,
+            Accept: "application/vnd.github+json",
           },
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.PERSONAL_ACCESS_TOKEN}`,
-              Accept: "application/vnd.github+json",
-            },
-          }
-        );
+        }
+      );
 
-        // Respond to Slack to close the modal
-        res.send({ response_action: "clear" });
-      } catch (error) {
-        console.error("GitHub dispatch error:", error.message);
-        res.send({
-          response_action: "errors",
-          errors: {
-            title_section: "Something went wrong. Try again.",
-          },
-        });
-      }
+      // Respond to Slack to close the modal
+      res.send({ response_action: "clear" });
     } catch (error) {
-      console.error("Error fetching user info from Slack:", error.message);
+      console.error("GitHub dispatch error:", error.message);
       res.send({
         response_action: "errors",
         errors: {
