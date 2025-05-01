@@ -84,6 +84,49 @@ app.post("/slack/actions", async (req, res) => {
 
 
 
+app.post("/slack/interactive", async (req, res) => {
+  const payload = JSON.parse(req.body.payload);
+
+  if (payload.type === "view_submission") {
+    const title = payload.view.state.values.title_section.title_input.value;
+    const description = payload.view.state.values.description_section.description_input.value;
+
+    // Trigger GitHub Action
+    try {
+      await axios.post(
+        `https://api.github.com/repos/${process.env.REPO}/actions/workflows/create-issue.yml/dispatches`,
+        {
+          ref: "main",
+          inputs: {
+            title,
+            body: description,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.PERSONAL_ACCESS_TOKEN}`,
+            Accept: "application/vnd.github+json",
+          },
+        }
+      );
+
+      // Respond to Slack to close the modal
+      res.send({ response_action: "clear" });
+    } catch (error) {
+      console.error("GitHub dispatch error:", error.message);
+      res.send({
+        response_action: "errors",
+        errors: {
+          title_section: "Something went wrong. Try again.",
+        },
+      });
+    }
+  } else {
+    res.status(200).send(); // Default response for other interactions
+  }
+});
+
+
 
 // This endpoint is used to listen to Slack events
 // app.post("/slack/actions", async (req, res) => {
