@@ -29,7 +29,7 @@ app.post("/create-issue", async (req, res) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.GITHUB_PAT}`,
+          Authorization: `Bearer ${process.env.PERSONAL_ACCESS_TOKEN}`,
           Accept: "application/vnd.github+json",
         },
       }
