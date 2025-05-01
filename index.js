@@ -82,6 +82,7 @@ app.post("/slack/actions", async (req, res) => {
   // Other types (like shortcuts) can still go here
 });
 
+const slackApiUrl = "https://slack.com/api/users.info";
 
 
 // Slack Interaction Handler
